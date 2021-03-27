@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .dropbtn {
+            background-color: #0091bd;
+            color: white;
+            padding-left: 16px;
+            padding-right: 16px;
+            padding: 9px;
+            font-size: 16px;
+            border: none;
+            border-radius: 15px;
+            margin: 12px;
+        }
+        
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f1f1f1;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+        
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        .dropdown:hover .dropbtn {
+            background-color: #16a0ca;
+        }
+        
+        .songdiv {
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+        
+        .song,
+        select {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .sbutton {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .sbutton:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="user">
+        <img width="50" height="50" src="https://cdn.discordapp.com/avatars/<%= userInfo.id %>/<%= userInfo.avatar %>.png">
+        <p>welcome
+            <%= userInfo.username %>
+        </p>
+    </div>
+    <br>
+    <br>
+
+    <% mutualGuilds.forEach(guild => { %>
+
+        <div class="dropdown">
+            <button onmouseover="setg('<%= guild.id %>')" class="dropbtn"><%= guild.name %></button>
+            <div class="dropdown-content">
+                <% channels[guild.id].forEach(gchannel => { %>
+                    <button onclick="setc('<%= gchannel.id %>')">
+                        <%= gchannel.name %>
+                    </button>
+                    <% }) %>
+            </div>
+        </div>
+        <% }) %>
+            <div class="songdiv">
+                <label for="song">Song name or youtube URL</label>
+                <input class="song" type="text" id="song" name="song" placeholder="enter song...">
+
+                <button class="sbutton" onclick="submit()">play!</button>
+                <br>
+                <button class="sbutton" onclick="skip()">skip current song!</button>
+            </div>
+            <div class="respons">
+                <p id="res"></p>
+                <p id="error"></p>
+            </div>
+
+            <script>
+                let serverid;
+                let channelid;
+                let userid = '<%= userInfo.id %>';
+                let song;
+
+                function setg(gid) {
+                    serverid = gid
+                    console.log(serverid)
+                }
+
+                function setc(cid) {
+                    channelid = cid
+
+                }
+
+
+                async function skip() {
+
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.responseType = 'json';
+                    xhttp.open("GET", `/gmusic?serverid=${serverid}&channelid=${channelid}&userid=${userid}&skip=true`, true);
+
+                    xhttp.onload = function() {
+                        var jsonResponse = xhttp.response;
+                        // do something with jsonResponse
+                        document.getElementById("error").innerHTML = jsonResponse.error;
+                        document.getElementById("res").innerHTML = jsonResponse.r;
+
+                    };
+                    xhttp.send();
+
+
+                }
+                async function submit() {
+
+                    song = await document.getElementById("song").value.replace(' ', '%20').replace('/', '%20')
+
+                    var xhttp = new XMLHttpRequest();
+                    xhttp.responseType = 'json';
+                    xhttp.open("GET", `/gmusic?serverid=${serverid}&channelid=${channelid}&userid=${userid}&song=${song}`, true);
+                    xhttp.onload = function() {
+                        var jsonResponse = xhttp.response;
+                        // do something with jsonResponse
+                        document.getElementById("error").innerHTML = jsonResponse.error;
+                        document.getElementById("res").innerHTML = jsonResponse.r;
+
+                    };
+                    xhttp.send();
+
+
+                }
+            </script>
+
+</body>
+
+</html>

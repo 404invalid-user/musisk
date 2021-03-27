@@ -1,0 +1,9 @@
+{
+    "port": 8080,
+    "scope": "identify email guilds guilds.join",
+    "clientId": "client id",
+    "clientSecret": "client secret",
+    "redirectUri": "/music",
+    "token": "bot token"
+
+}
